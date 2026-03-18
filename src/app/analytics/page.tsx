@@ -203,7 +203,7 @@ export default function AnalyticsPage() {
                  value: data?.bookings?.total?.toString() || "0", 
                  icon: TrendingUp, 
                  color: "text-emerald-400",
-                 change: `${data?.bookings?.pending_change > 0 ? '+' : ''}${data?.bookings?.pending_change || 0}%`
+                 change: `${(data?.bookings?.pending_change ?? 0) > 0 ? '+' : ''}${data?.bookings?.pending_change ?? 0}%`
                },
                { 
                  label: "Growth Rate", 

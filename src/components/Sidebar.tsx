@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
   Car, 
@@ -30,6 +30,22 @@ const navItems = [
 
 export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        router.push('/');
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
   return (
     <div className={cn(
@@ -71,7 +87,10 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
       </nav>
 
       <div className="p-4 border-t border-white/5">
-        <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400/60 hover:text-red-400 hover:bg-red-400/5 transition-all duration-300 group">
+        <button 
+          onClick={handleSignOut}
+          className="flex items-center cursor-pointer gap-3 px-4 py-3 w-full rounded-xl text-red-400/60 hover:text-red-400 hover:bg-red-400/5 transition-all duration-300 group"
+        >
           <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Sign Out</span>
         </button>
