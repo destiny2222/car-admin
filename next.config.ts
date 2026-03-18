@@ -17,14 +17,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/admin/:path*',
-        destination: 'https://aria-app-9boes.ondigitalocean.app/api/admin/:path*',
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/admin/:path*',
+  //       destination: 'https://aria-app-9boes.ondigitalocean.app/api/admin/:path*',
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

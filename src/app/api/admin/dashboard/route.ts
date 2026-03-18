@@ -1,42 +1,92 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const period = searchParams.get('period') || 'this_month';
+// Helper to get auth token from cookie or header
+function getAuthToken(request: NextRequest): string | null {
+  // First try Authorization header
+  const authHeader = request.headers.get('authorization');
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '').replace('Bearer', '').trim();
+    if (token) return token;
+  }
+  
+  // Fall back to cookies
+  const token = request.cookies.get('admin_token')?.value 
+    || request.cookies.get('token')?.value
+    || request.cookies.get('session')?.value
+    || request.cookies.get('auth_token')?.value;
+  return token || null;
+}
 
-  // Mock data for dashboard
-  const mockData = {
-    status: true,
-    data: {
-      listings: {
-        total: 156,
-        pending: 12,
-        approved: 128,
-        declined: 16,
-        pending_change: 8,
-        approved_change: 15,
-        declined_change: -5
-      },
-      bookings: {
-        total: 342,
-        pending: 24,
-        in_progress: 18,
-        completed: 300,
-        pending_change: 12,
-        in_progress_change: 5,
-        completed_change: 25
-      },
-      users: {
-        total: 89,
-        monthly_change: 18
-      },
-      revenue: {
-        total: 45680,
-        monthly_change: 23
-      }
-    },
-    period
+// Helper to create CORS headers
+function getCorsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+}
 
-  return NextResponse.json(mockData);
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const period = searchParams.get('period') || 'this_month';
+
+    const externalApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/dashboard?period=${period}`;
+    console.log('Dashboard API - Calling:', externalApiUrl);
+
+    // Get auth token from header or cookie
+    const token = getAuthToken(request);
+    console.log('Dashboard API - Auth token:', token);
+
+    // Build headers
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    // Forward cookies from the browser to the external API
+    const cookieHeader = request.headers.get('cookie') ?? '';
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
+    // Add Authorization header if token exists
+    if (token && token !== 'true') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    console.log('Dashboard API - Request headers:', headers);
+
+    const response = await fetch(externalApiUrl, {
+      method: 'GET',
+      headers,
+    });
+
+    console.log('Dashboard API - Response status:', response.status);
+    
+    const data = await response.json();
+    console.log('Dashboard API - Response data:', data);
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        return NextResponse.json(
+          { success: false, message: data.message || 'Unauthorized' },
+          { status: 401 }
+        );
+      }
+      // Return the actual error from external API
+      return NextResponse.json(
+        { success: false, message: data.message || 'Failed to fetch dashboard', data: data },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json(data);
+
+  } catch (error) {
+    console.error('Dashboard API error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

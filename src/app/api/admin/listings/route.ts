@@ -1,111 +1,128 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const limit = searchParams.get('limit') || '10';
-  const status = searchParams.get('status') || 'all';
-  const page = searchParams.get('page') || '1';
-
-  // Mock listings/cars data
-  const mockListings = [
-    {
-      id: 1,
-      make: "Toyota",
-      model: "Camry",
-      year: 2023,
-      price: 28000,
-      mileage: 15000,
-      fuel_type: "Petrol",
-      transmission: "Automatic",
-      status: "approved",
-      image_url: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400",
-      created_at: "2024-02-15T10:00:00Z"
-    },
-    {
-      id: 2,
-      make: "Honda",
-      model: "Accord",
-      year: 2022,
-      price: 32000,
-      mileage: 25000,
-      fuel_type: "Petrol",
-      transmission: "Automatic",
-      status: "approved",
-      image_url: "https://images.unsplash.com/photo-1606611013016-969c19ba27bb?w=400",
-      created_at: "2024-02-20T14:30:00Z"
-    },
-    {
-      id: 3,
-      make: "Tesla",
-      model: "Model 3",
-      year: 2024,
-      price: 45000,
-      mileage: 5000,
-      fuel_type: "Electric",
-      transmission: "Automatic",
-      status: "pending",
-      image_url: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400",
-      created_at: "2024-03-01T09:15:00Z"
-    },
-    {
-      id: 4,
-      make: "BMW",
-      model: "3 Series",
-      year: 2023,
-      price: 48000,
-      mileage: 18000,
-      fuel_type: "Petrol",
-      transmission: "Automatic",
-      status: "approved",
-      image_url: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400",
-      created_at: "2024-02-10T11:45:00Z"
-    },
-    {
-      id: 5,
-      make: "Mercedes",
-      model: "C-Class",
-      year: 2023,
-      price: 52000,
-      mileage: 12000,
-      fuel_type: "Petrol",
-      transmission: "Automatic",
-      status: "declined",
-      image_url: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400",
-      created_at: "2024-01-25T16:20:00Z"
-    },
-    {
-      id: 6,
-      make: "Audi",
-      model: "A4",
-      year: 2022,
-      price: 42000,
-      mileage: 30000,
-      fuel_type: "Petrol",
-      transmission: "Automatic",
-      status: "approved",
-      image_url: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400",
-      created_at: "2024-02-05T13:10:00Z"
-    }
-  ];
-
-  // Filter by status if provided
-  let filteredListings = mockListings;
-  if (status && status !== 'all') {
-    filteredListings = mockListings.filter(l => l.status === status);
+// Helper to get auth token from cookie or header
+function getAuthToken(request: NextRequest): string | null {
+  // First try Authorization header
+  const authHeader = request.headers.get('authorization');
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '').replace('Bearer', '').trim();
+    if (token) return token;
   }
+  
+  // Fall back to cookies
+  const token = request.cookies.get('admin_token')?.value 
+    || request.cookies.get('token')?.value
+    || request.cookies.get('session')?.value
+    || request.cookies.get('auth_token')?.value;
+  return token || null;
+}
 
-  // Apply limit
-  const limitedListings = filteredListings.slice(0, parseInt(limit as string));
-
-  const mockResponse = {
-    status: true,
-    data: {
-      listings: limitedListings,
-      total: filteredListings.length,
-      page: parseInt(page as string),
-      total_pages: Math.ceil(filteredListings.length / 10)
-    }
+// Helper to create CORS headers
+function getCorsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+}
 
-  return NextResponse.json(mockResponse);
+export async function GET(request: NextRequest) {
+  try {
+    const token = getAuthToken(request);
+    
+    if (!token) {
+      return NextResponse.json(
+        { status: false, message: 'Unauthorized' },
+        { status: 401, headers: getCorsHeaders() }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page') || '1';
+    const limit = searchParams.get('limit') || '10';
+    const status = searchParams.get('status');
+    const search = searchParams.get('search');
+
+    // Build query string
+    const queryParams = new URLSearchParams({
+      page,
+      limit,
+    });
+    
+    if (status && status !== 'all') {
+      queryParams.append('status', status);
+    }
+    if (search) {
+      queryParams.append('search', search);
+    }
+
+    const externalApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/listings?${queryParams.toString()}`;
+    console.log('Listings API - Calling:', externalApiUrl);
+
+    // Build headers
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    // Forward cookies
+    const cookieHeader = request.headers.get('cookie') ?? '';
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
+    // Add Authorization header if token exists and is not 'true'
+    if (token && token !== 'true') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Try calling external API with Bearer token first
+    let response = await fetch(externalApiUrl, { 
+      method: 'GET', 
+      headers
+    });
+    console.log('Listings API - First attempt status:', response.status);
+    
+    // If 401/403, try without Bearer prefix
+    if (response.status === 401 || response.status === 403) {
+      response = await fetch(externalApiUrl, { 
+        method: 'GET', 
+        headers: { 'Authorization': token, 'Content-Type': 'application/json' }
+      });
+      console.log('Listings API - Second attempt status:', response.status);
+    }
+    
+    // If still not OK, try with token header instead
+    if (!response.ok) {
+      response = await fetch(externalApiUrl, { 
+        method: 'GET', 
+        headers: { 'token': token, 'Content-Type': 'application/json' }
+      });
+      console.log('Listings API - Third attempt status:', response.status);
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { status: false, message: data.message || 'Failed to fetch listings' },
+        { status: response.status, headers: getCorsHeaders() }
+      );
+    }
+
+    return NextResponse.json(data, { headers: getCorsHeaders() });
+  } catch (error) {
+    console.error('Listings API error:', error);
+    return NextResponse.json(
+      { status: false, message: 'Internal server error' },
+      { status: 500, headers: getCorsHeaders() }
+    );
+  }
+}
+
+// Handle OPTIONS preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(),
+  });
 }

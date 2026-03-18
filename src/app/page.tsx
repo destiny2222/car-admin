@@ -18,7 +18,8 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+      // Use local API route to ensure cookies are properly set
+      const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,6 +32,8 @@ export default function LoginPage() {
       if (!response.ok) {
         if (response.status === 400) {
           throw new Error(data.message || "Invalid credentials. Please check your email and password.");
+        } else if (response.status === 401) {
+          throw new Error(data.message || "Invalid credentials. Please check your email and password.");
         } else if (response.status === 403) {
           throw new Error(data.message || "Account temporarily unavailable. Please try again later.");
         } else {
@@ -38,7 +41,15 @@ export default function LoginPage() {
         }
       }
 
-      router.push("/dashboard");
+      // Check if login was successful by verifying the response
+      if (data.status || data.success || data.token) {
+        // Small delay to ensure cookie is set before redirect
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);
+      } else {
+        throw new Error(data.message || "Login failed. Please try again.");
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

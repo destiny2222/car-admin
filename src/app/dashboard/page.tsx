@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
+
 import { 
   TrendingUp, 
   Users, 
@@ -96,6 +97,9 @@ function SortableStatCard({ stat }: { stat: StatItem }) {
   );
 }
 
+
+
+
 // --- Main Page Component ---
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
@@ -165,12 +169,27 @@ export default function DashboardPage() {
       });
 
       // Fetch Stats
-      const statsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard?${queryParams.toString()}`);
+      const statsRes = await fetch(`/api/admin/dashboard?${queryParams.toString()}`, { credentials: 'include' });
       const statsData = await statsRes.json();
 
+      if (!statsRes.ok) {
+        if (statsRes.status === 401 || statsRes.status === 403) {
+          window.location.href = '/';
+          return;
+        }
+        throw new Error(statsData.message || 'Failed to fetch dashboard stats');
+      }
+
       // Fetch Recent Bookings for Activity
-      const activityRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings?limit=5`);
+      const activityRes = await fetch(`/api/admin/bookings?limit=5`, { credentials: 'include' });
       const activityData = await activityRes.json();
+
+      if (!activityRes.ok) {
+        if (activityRes.status === 401 || activityRes.status === 403) {
+          window.location.href = '/';
+          return;
+        }
+      }
 
       if (statsData.status && statsData.data) {
         const { listings, bookings, users } = statsData.data;
@@ -263,6 +282,10 @@ export default function DashboardPage() {
       }
 
     } catch (err: unknown) {
+      if (err instanceof Error && (err.message.includes("401") || err.message.includes("403") || err.message.toLowerCase().includes("unauthorized"))) {
+        window.location.href = '/';
+        return;
+      }
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);

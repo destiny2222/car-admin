@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardShell } from "@/components/DashboardShell";
+import { useRouter } from "next/navigation";
 import { 
   Eye,
   Check,
@@ -42,7 +43,24 @@ interface Listing {
   };
 }
 
+// Helper function to get auth token from cookies
+function getAuthToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const cookies = document.cookie.split(';');
+  const authCookie = cookies.find(c => 
+    c.trim().startsWith('session=') || 
+    c.trim().startsWith('token=') ||
+    c.trim().startsWith('auth_token=') ||
+    c.trim().startsWith('admin_token=')
+  );
+  if (authCookie) {
+    return authCookie.split('=')[1] || authCookie.split('=')[1];
+  }
+  return null;
+}
+
 export default function CarsPage() {
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,13 +85,24 @@ export default function CarsPage() {
         ...(searchTerm && { search: searchTerm }),
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/listings?${queryParams.toString()}`, {
+      // Get auth token
+      const token = getAuthToken();
+      const authHeaders: HeadersInit = token ? { "Authorization": `Bearer ${token}` } : {};
+
+      // Use local API route
+      const response = await fetch(`/api/admin/listings?${queryParams.toString()}`, {
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          router.push('/');
+          return;
+        }
         throw new Error("Failed to fetch listings.");
       }
 
@@ -86,6 +115,11 @@ export default function CarsPage() {
         setTotalListings(data.data.pagination?.total || items.length);
       }
     } catch (err: unknown) {
+      // If unauthorized, redirect to login
+      if (err instanceof Error && (err.message.includes('401') || err.message.includes('unauthorized'))) {
+        router.push('/');
+        return;
+      }
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -104,13 +138,16 @@ export default function CarsPage() {
     }
     
     setUpdatingStatusId(`${id}-${newStatus}`);
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/listings/status?listingId=${id}`, {
+      // Use local API route
+      const response = await fetch(`/api/admin/listings/status?listingId=${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ status: newStatus, ...(reason && { reason }) }),
+        credentials: 'include',
       });
 
       if (!response.ok) {

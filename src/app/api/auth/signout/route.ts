@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 
-export async function POST() {
-  const response = NextResponse.json({ success: true }, { status: 200 });
+export async function POST(request: Request) {
+    try {
+        const response = NextResponse.json({
+            status: true,
+            message: "Signed out successfully",
+        });
 
-  // Clear all auth cookies
-  response.cookies.set('session', '', { expires: new Date(0) });
-  response.cookies.set('token', '', { expires: new Date(0) });
-  response.cookies.set('auth_token', '', { expires: new Date(0) });
-  response.cookies.set('admin_token', '', { expires: new Date(0) });
+        response.cookies.delete("admin_token");
 
-  return response;
+        return response;
+    } catch (error) {
+        console.error("Sign out error:", error);
+        return NextResponse.json(
+            { status: false, message: "Failed to sign out" },
+            { status: 500 }
+        );
+    }
 }

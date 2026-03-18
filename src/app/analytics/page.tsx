@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardShell } from "@/components/DashboardShell";
+import { useRouter } from "next/navigation";
 import { 
   BarChart3, 
   PieChart as PieChartIcon, 
@@ -42,7 +43,24 @@ interface DashboardData {
   };
 }
 
+// Helper function to get auth token from cookies
+function getAuthToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const cookies = document.cookie.split(';');
+  const authCookie = cookies.find(c => 
+    c.trim().startsWith('session=') || 
+    c.trim().startsWith('token=') ||
+    c.trim().startsWith('auth_token=') ||
+    c.trim().startsWith('admin_token=')
+  );
+  if (authCookie) {
+    return authCookie.split('=')[1] || authCookie.split('=')[1];
+  }
+  return null;
+}
+
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,13 +68,24 @@ export default function AnalyticsPage() {
   const fetchAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`, {
+      
+      // Get auth token
+      const token = getAuthToken();
+      const authHeaders: HeadersInit = token ? { "Authorization": `Bearer ${token}` } : {};
+
+      // Use local API route
+      const response = await fetch(`/api/admin/dashboard`, {
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          router.push('/');
+          return;
+        }
         throw new Error("Failed to fetch analytics data.");
       }
 
@@ -67,6 +96,11 @@ export default function AnalyticsPage() {
         setData(result.data);
       }
     } catch (err: unknown) {
+      // If unauthorized, redirect to login
+      if (err instanceof Error && (err.message.includes('401') || err.message.includes('unauthorized'))) {
+        router.push('/');
+        return;
+      }
       if (err instanceof Error) {
         setError(err.message);
       } else {

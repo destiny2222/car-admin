@@ -1,54 +1,53 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, password } = body;
 
-    // Mock authentication - accept any credentials for demo
-    // In production, validate against a real database
-    if (email && password) {
-      const response = NextResponse.json(
-        {
-          status: true,
-          message: "Login successful",
-          data: {
-            user: {
-              id: 1,
-              email: email,
-              name: "Admin User",
-              role: "admin"
-            }
-          }
-        },
-        { status: 200 }
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: 'Email and password are required' },
+        { status: 400 }
       );
-
-      // Set auth cookie
-      response.cookies.set('session', 'mock-session-token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7 // 7 days
-      });
-
-      response.cookies.set('token', 'mock-auth-token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7 // 7 days
-      });
-
-      return response;
     }
 
-    return NextResponse.json(
-      { status: false, message: "Invalid credentials" },
-      { status: 400 }
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+      // console.log('Login API response:', data);
+      // console.log('Login API status:', response.status);
+      // console.log('Login Set-Cookie header:', response.headers.get('set-cookie'));
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { success: false, message: data.message || 'Invalid credentials' },
+        { status: response.status }
+      );
+    }
+
+    // Create response with success data
+    const nextResponse = NextResponse.json(
+      { success: true, message: 'Login successful', data: data.data },
+      { status: 200 }
     );
+
+    // Forward ALL Set-Cookie headers from the external API
+    const setCookie = response.headers.get('set-cookie');
+    if (setCookie) {
+      nextResponse.headers.set('set-cookie', setCookie);
+    }
+
+    return nextResponse;
+
   } catch (error) {
+    // console.error('Login API error:', error);
     return NextResponse.json(
-      { status: false, message: "Internal server error" },
+      { success: false, message: 'An unexpected error occurred' },
       { status: 500 }
     );
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardShell } from "@/components/DashboardShell";
+import { useRouter } from "next/navigation";
 import { 
   User,
   Car,
@@ -49,7 +50,24 @@ interface Booking {
   };
 }
 
+// Helper function to get auth token from cookies
+function getAuthToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const cookies = document.cookie.split(';');
+  const authCookie = cookies.find(c => 
+    c.trim().startsWith('session=') || 
+    c.trim().startsWith('token=') ||
+    c.trim().startsWith('auth_token=') ||
+    c.trim().startsWith('admin_token=')
+  );
+  if (authCookie) {
+    return authCookie.split('=')[1] || authCookie.split('=')[1];
+  }
+  return null;
+}
+
 export default function BookingPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,13 +90,24 @@ export default function BookingPage() {
         ...(searchTerm && { search: searchTerm }),
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings?${queryParams.toString()}`, {
+      // Get auth token
+      const token = getAuthToken();
+      const authHeaders: HeadersInit = token ? { "Authorization": `Bearer ${token}` } : {};
+
+      // Use local API route
+      const response = await fetch(`/api/admin/bookings?${queryParams.toString()}`, {
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          router.push('/');
+          return;
+        }
         throw new Error("Failed to fetch bookings.");
       }
 
@@ -91,6 +120,11 @@ export default function BookingPage() {
         setTotalBookings(data.data.pagination?.total || items.length);
       }
     } catch (err: unknown) {
+      // If unauthorized, redirect to login
+      if (err instanceof Error && (err.message.includes('401') || err.message.includes('unauthorized'))) {
+        router.push('/');
+        return;
+      }
       if (err instanceof Error) {
         setError(err.message);
       } else {
