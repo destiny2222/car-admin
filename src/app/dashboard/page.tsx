@@ -235,8 +235,18 @@ export default function DashboardPage() {
       }
 
       if (activityData.status && activityData.data) {
-        const rawActivities = Array.isArray(activityData.data) ? activityData.data : (activityData.data.data || []);
-        const mappedActivities = rawActivities.map((b: any) => {
+        interface RawActivity {
+          id: string;
+          reference?: string;
+          status?: string;
+          createdAt?: string;
+          listing?: {
+            make?: string;
+            model?: string;
+          };
+        }
+        const rawActivities: RawActivity[] = Array.isArray(activityData.data) ? activityData.data : (activityData.data.data || []);
+        const mappedActivities = rawActivities.map((b) => {
           const ref = b.reference || b.id || "0000";
           return {
             id: b.id,
