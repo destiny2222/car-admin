@@ -8,7 +8,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-mesh selection:bg-primary/30 selection:text-white flex">
+    <div className="min-h-screen bg-mesh selection:bg-primary/10 selection:text-primary flex">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
       <div className="flex-1 lg:ml-64 min-h-screen flex flex-col">

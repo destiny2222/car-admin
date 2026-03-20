@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState < string | null > (null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,27 +62,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-12 text-white overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-12 text-white overflow-hidden bg-slate-950">
       <BackgroundMesh />
-      
-      {/* Decorative Silhouette */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none hidden sm:block">
+
+      {/* Decorative Silhouette with Dark Overlay */}
+      <div className="absolute inset-0 z-0 pointer-events-none hidden sm:block">
+        <div className="absolute inset-0 bg-slate-950/40 z-10" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] 
         bg-[url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2560')] 
         bg-no-repeat bg-center bg-contain mix-blend-overlay grayscale animate-pulse duration-[10s]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in duration-700">
-        <div className="glass-card p-6 sm:p-10 space-y-6 sm:space-y-8 relative overflow-hidden">
+        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 sm:p-10 space-y-6 sm:space-y-8 relative overflow-hidden rounded-[2.5rem] shadow-2xl">
           {/* Accent Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[100px] rounded-full" />
-          
+
           <div className="text-center space-y-2">
             <div className="inline-flex w-14 h-14 bg-primary rounded-2xl items-center justify-center shadow-2xl shadow-primary/40 mb-4 animate-bounce duration-[3s]">
               <Car className="text-white w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
-            <p className="text-white/40 text-sm">Monitor your luxury fleet in real-time</p>
+            <h1 className="text-4xl font-black tracking-tight text-white drop-shadow-sm">Welcome Back</h1>
+            <p className="text-white/60 font-medium text-sm">Monitor your luxury fleet in real-time</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -95,38 +96,38 @@ export default function LoginPage() {
               )}
 
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-primary transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
                   required
                   placeholder="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/3 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-medium"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary/40 transition-all font-bold"
                 />
               </div>
 
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-primary transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   required
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/3 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-medium"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary/40 transition-all font-bold"
                 />
               </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer group">
-                <div className="w-4 h-4 rounded border border-white/20 group-hover:border-primary/50 transition-colors bg-white/2" />
-                <span className="text-white/40 group-hover:text-white transition-colors">Remember me</span>
+                <div className="w-4 h-4 rounded border border-white/20 group-hover:border-primary/50 transition-colors bg-white/5" />
+                <span className="text-white/60 font-bold group-hover:text-white transition-colors">Remember me</span>
               </label>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-primary hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-xl shadow-primary/20 hover:shadow-primary/40 group active:scale-[0.98]"

@@ -49,7 +49,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 h-full w-64 glass border-r border-white/5 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0",
+      "fixed left-0 top-0 h-full w-64 glass border-r border-slate-200 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 bg-white",
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="p-8">
@@ -57,7 +57,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
             <Car className="text-white w-6 h-6" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">Aria<span className="text-primary italic">Luxury</span></span>
+          <span className="text-xl font-bold tracking-tight text-slate-900">Aria<span className="text-primary italic">Luxury</span></span>
         </div>
       </div>
 
@@ -72,13 +72,13 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group",
                 isActive 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                  ? "bg-primary/5 text-primary" 
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
               )}
             >
               <item.icon className={cn(
                 "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
-                isActive ? "text-primary" : "text-white/40 group-hover:text-white/80"
+                isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-600"
               )} />
               <span className="font-medium">{item.name}</span>
             </Link>
@@ -86,10 +86,10 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-slate-100">
         <button 
           onClick={handleSignOut}
-          className="flex items-center cursor-pointer gap-3 px-4 py-3 w-full rounded-xl text-red-400/60 hover:text-red-400 hover:bg-red-400/5 transition-all duration-300 group"
+          className="flex items-center cursor-pointer gap-3 px-4 py-3 w-full rounded-xl text-red-500/60 hover:text-red-500 hover:bg-red-50 transition-all duration-300 group"
         >
           <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Sign Out</span>

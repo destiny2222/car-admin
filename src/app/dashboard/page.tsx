@@ -75,24 +75,24 @@ function SortableStatCard({ stat }: { stat: StatItem }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`glass-card p-6 group ${isDragging ? 'opacity-50 ring-2 ring-primary border-primary animate-pulse' : 'hover:translate-y-[-4px]'} transition-all duration-300`}
+      className={`glass-card p-6 group bg-white border border-slate-200/50 ${isDragging ? 'opacity-50 ring-2 ring-primary border-primary animate-pulse' : 'hover:translate-y-[-4px] hover:shadow-xl hover:shadow-slate-200/50'} transition-all duration-300`}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className={`p-3 rounded-2xl bg-white/3 ${stat.color} shadow-lg ${stat.glow}`}>
+        <div className={`p-3 rounded-2xl bg-slate-50 ${stat.color} shadow-sm border border-slate-100`}>
           <stat.icon className="w-6 h-6" />
         </div>
         <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-1 text-sm font-bold ${stat.trend === 'up' ? 'text-emerald-400' : 'text-red-400'}`}>
+            <div className={`flex items-center gap-1 text-sm font-bold ${stat.trend === 'up' ? 'text-emerald-600' : 'text-red-500'}`}>
               {stat.change}
               {stat.trend === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
             </div>
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 text-white/10 hover:text-white/40 transition-colors">
+            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 text-slate-200 hover:text-slate-400 transition-colors">
                <GripHorizontal className="w-4 h-4" />
             </div>
         </div>
       </div>
-      <p className="text-white/40 text-sm font-medium">{stat.name}</p>
-      <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
+      <p className="text-slate-500 text-sm font-medium">{stat.name}</p>
+      <h3 className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</h3>
     </div>
   );
 }
@@ -326,28 +326,24 @@ export default function DashboardPage() {
 
   return (
     <DashboardShell>
-      <div className="space-y-8">
+      <div className="space-y-8 pt-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">Fleet Overview</h1>
-            <p className="text-white/40 text-sm sm:text-base">Real-time snapshots of your global operations.</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">Fleet Overview</h1>
+            <p className="text-slate-500 text-sm sm:text-base">Real-time snapshots of your global luxury operations.</p>
           </div>
           <div className="flex items-center gap-3">
-             <div className="px-3 sm:px-4 py-2 glass rounded-lg flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-white/60">Live Updates</span>
+             <div className="px-3 sm:px-4 py-2 border border-slate-200/80 bg-white rounded-xl flex items-center gap-2 shadow-sm">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-400">Live Updates</span>
              </div>
-             {/* <button className="bg-primary hover:bg-primary-light text-white px-4 sm:px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 whitespace-nowrap">
-               <Plus className="w-5 h-5" />
-               <span className="inline">Add Widget</span>
-             </button> */}
           </div>
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm animate-in fade-in slide-in-from-top-2 flex items-center gap-3">
-             <AlertCircle className="w-5 h-5" />
-             <p>{error}</p>
+          <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm animate-in fade-in slide-in-from-top-2 flex items-center gap-3">
+             <AlertCircle className="w-5 h-5 shrink-0" />
+             <p className="font-bold">{error}</p>
           </div>
         )}
 
@@ -373,53 +369,53 @@ export default function DashboardPage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-6"
+            className="glass-card p-6 bg-white border border-slate-200/50"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Car className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Car className="w-5 h-5 text-blue-600" />
                 Listings Breakdown
               </h3>
-              <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold">Status Overview</span>
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Status Overview</span>
             </div>
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Approved</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Approved</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.listings?.approved || 0}</span>
-                  <span className="text-[10px] text-emerald-400 font-bold mb-1">+{detailedStats?.listings?.approvedChange || 0}%</span>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.listings?.approved || 0}</span>
+                  <span className="text-[10px] text-emerald-600 font-bold mb-1">+{detailedStats?.listings?.approvedChange || 0}%</span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Pending</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Pending</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.listings?.pending || 0}</span>
-                  <span className={`text-[10px] font-bold mb-1 ${(detailedStats?.listings?.pendingChange || 0) >= 0 ? 'text-amber-400' : 'text-red-400'}`}>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.listings?.pending || 0}</span>
+                  <span className={`text-[10px] font-bold mb-1 ${(detailedStats?.listings?.pendingChange || 0) >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
                     {detailedStats?.listings?.pendingChange || 0}%
                   </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Declined</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Declined</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.listings?.declined || 0}</span>
-                  <span className="text-[10px] text-white/20 font-bold mb-1">{detailedStats?.listings?.declinedChange || 0}%</span>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.listings?.declined || 0}</span>
+                  <span className="text-[10px] text-slate-300 font-bold mb-1">{detailedStats?.listings?.declinedChange || 0}%</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/5">
+            <div className="mt-6 pt-6 border-t border-slate-100">
               <div className="flex justify-between items-center text-[10px]">
-                <span className="text-white/40 uppercase tracking-widest font-bold">Health Score</span>
-                <span className="text-blue-400 font-bold">98% Verified</span>
+                <span className="text-slate-500 uppercase tracking-widest font-bold">Health Score</span>
+                <span className="text-blue-600 font-bold">98% Verified</span>
               </div>
-              <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: '98%' }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]"
+                  className="h-full bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.3)]"
                 />
               </div>
             </div>
@@ -429,51 +425,51 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-card p-6"
+            className="glass-card p-6 bg-white border border-slate-200/50"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Activity className="w-5 h-5 text-emerald-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-emerald-600" />
                 Bookings Analysis
               </h3>
-              <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold">Volume Trends</span>
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Volume Trends</span>
             </div>
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">In Progress</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">In Progress</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.bookings?.in_progress || 0}</span>
-                  <span className="text-[10px] text-emerald-400 font-bold mb-1">+{detailedStats?.bookings?.inProgressChange || 0}%</span>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.bookings?.in_progress || 0}</span>
+                  <span className="text-[10px] text-emerald-600 font-bold mb-1">+{detailedStats?.bookings?.inProgressChange || 0}%</span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Pending</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Pending</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.bookings?.pending || 0}</span>
-                  <span className="text-[10px] text-amber-400 font-bold mb-1">{detailedStats?.bookings?.pendingChange || 0}%</span>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.bookings?.pending || 0}</span>
+                  <span className="text-[10px] text-amber-600 font-bold mb-1">{detailedStats?.bookings?.pendingChange || 0}%</span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Completed</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Completed</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">{detailedStats?.bookings?.completed || 0}</span>
-                  <span className="text-[10px] text-blue-400 font-bold mb-1">+{detailedStats?.bookings?.completedChange || 0}%</span>
+                  <span className="text-xl font-bold text-slate-900 uppercase">{detailedStats?.bookings?.completed || 0}</span>
+                  <span className="text-[10px] text-blue-600 font-bold mb-1">+{detailedStats?.bookings?.completedChange || 0}%</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/5">
+            <div className="mt-6 pt-6 border-t border-slate-100">
               <div className="flex justify-between items-center text-[10px]">
-                <span className="text-white/40 uppercase tracking-widest font-bold">Fulfillment Rate</span>
-                <span className="text-emerald-400 font-bold">100% Success</span>
+                <span className="text-slate-500 uppercase tracking-widest font-bold">Fulfillment Rate</span>
+                <span className="text-emerald-600 font-bold">100% Success</span>
               </div>
-              <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: '100%' }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]"
+                  className="h-full bg-emerald-600 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]"
                 />
               </div>
             </div>
@@ -483,44 +479,44 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-card p-6"
+            className="glass-card p-6 bg-white border border-slate-200/50"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-amber-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-amber-600" />
                 User Growth Stats
               </h3>
-              <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold">Registration Data</span>
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Registration Data</span>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Total Users</p>
-                <div className="flex items-end gap-2 text-white">
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Total Users</p>
+                <div className="flex items-end gap-2 text-slate-900">
                   <span className="text-xl font-bold uppercase">{detailedStats?.users?.total || 0}</span>
-                  <span className="text-[10px] text-emerald-400 font-bold mb-1">Active</span>
+                  <span className="text-[10px] text-emerald-600 font-bold mb-1">Active</span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Gain</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Gain</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-xl font-bold text-white uppercase">+{detailedStats?.users?.monthlyChange || 0}</span>
-                  <TrendingUp className="text-emerald-400 w-3 h-3 mb-1.5" />
+                  <span className="text-xl font-bold text-slate-900 uppercase">+{detailedStats?.users?.monthlyChange || 0}</span>
+                  <TrendingUp className="text-emerald-600 w-3 h-3 mb-1.5" />
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/5">
+            <div className="mt-6 pt-6 border-t border-slate-100">
               <div className="flex justify-between items-center text-[10px]">
-                <span className="text-white/40 uppercase tracking-widest font-bold">Growth Velocity</span>
-                <span className="text-amber-400 font-bold">High Expansion</span>
+                <span className="text-slate-500 uppercase tracking-widest font-bold">Growth Velocity</span>
+                <span className="text-amber-600 font-bold">High Expansion</span>
               </div>
-              <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: '85%' }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]"
+                  className="h-full bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.3)]"
                 />
               </div>
             </div>
@@ -529,15 +525,15 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Dynamic Performance Chart */}
-          <div className="lg:col-span-2 glass-card p-8 group overflow-hidden">
+          <div className="lg:col-span-2 glass-card p-8 group overflow-hidden bg-white border border-slate-200/50 shadow-sm">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-white">Performance Over Time</h3>
-              <div className="flex gap-2">
+              <h3 className="text-xl font-bold text-slate-900">Performance Over Time</h3>
+              <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
                 {['Day', 'Week', 'Month'].map((tag) => (
                   <button 
                     key={tag} 
                     onClick={() => setSelectedPeriod(tag)}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedPeriod === tag ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPeriod === tag ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                   >
                     {tag}
                   </button>
@@ -549,11 +545,11 @@ export default function DashboardPage() {
               <svg className="w-full h-full overflow-visible" viewBox="0 0 1000 300">
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0d59f2" stopOpacity="0.4" />
+                    <stop offset="0%" stopColor="#0d59f2" stopOpacity="0.15" />
                     <stop offset="100%" stopColor="#0d59f2" stopOpacity="0" />
                   </linearGradient>
                   <filter id="glow">
-                    <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                     <feMerge>
                         <feMergeNode in="coloredBlur"/>
                         <feMergeNode in="SourceGraphic"/>
@@ -590,18 +586,18 @@ export default function DashboardPage() {
               </svg>
 
               {/* Tooltip Simulation */}
-              <div className="absolute top-10 left-[48%] glass p-2 rounded-lg border border-primary/20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                 <p className="text-[10px] font-bold text-white/40 uppercase">Peak Potential</p>
-                 <p className="text-sm font-bold text-white">Listings: {items[0].value}</p>
+              <div className="absolute top-10 left-[48%] bg-white/90 backdrop-blur-md p-3 rounded-xl border border-slate-200 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl shadow-slate-200/50">
+                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Peak Potential</p>
+                 <p className="text-sm font-black text-slate-900">Listings: {items[0].value}</p>
               </div>
             </div>
           </div>
 
           {/* Dynamic Recent Activity */}
-          <div className="glass-card p-8">
+          <div className="glass-card p-8 bg-white border border-slate-200/50 shadow-sm">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold text-white">Recent Activity</h3>
-              <MoreHorizontal className="text-white/20 w-5 h-5 cursor-pointer hover:text-white transition-colors" />
+              <h3 className="text-xl font-bold text-slate-900">Recent Activity</h3>
+              <MoreHorizontal className="text-slate-200 w-5 h-5 cursor-pointer hover:text-slate-400 transition-colors" />
             </div>
             
             <div className="space-y-6">
@@ -616,21 +612,22 @@ export default function DashboardPage() {
                       transition={{ delay: idx * 0.05 }}
                       className="flex items-center gap-4 group/item"
                     >
-                      <div className={`w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center shrink-0 group-hover/item:border-primary/40 transition-colors`}>
-                        <Car className="w-5 h-5 text-white/40 group-hover/item:text-white transition-colors" />
+                      <div className={`w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover/item:border-primary/20 transition-colors`}>
+                        <Car className="w-5 h-5 text-slate-400 group-hover/item:text-primary transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-white truncate">{item.name}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
-                           <span className={item.color}>{item.action}</span> • {item.time}
-                        </p>
+                        <p className="text-sm font-bold text-slate-900 truncate">{item.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${item.color.replace('text-emerald-400', 'text-emerald-600').replace('text-amber-400', 'text-amber-600').replace('text-blue-400', 'text-blue-600')}`}>{item.action}</span>
+                          <span className="text-[10px] text-slate-400">• {item.time}</span>
+                        </div>
                       </div>
-                      <ArrowUpRight className="w-4 h-4 text-white/10 group-hover/item:text-primary transition-all group-hover/item:translate-x-1 group-hover/item:-translate-y-1" />
+                      <ArrowUpRight className="w-4 h-4 text-slate-200 group-hover/item:text-primary transition-all group-hover/item:translate-x-1 group-hover/item:-translate-y-1" />
                     </motion.div>
                   ))
                 ) : (
-                  <div className="h-40 flex flex-col items-center justify-center text-white/10 italic text-sm">
-                    <Clock className="w-8 h-8 mb-2 opacity-10" />
+                  <div className="h-40 flex flex-col items-center justify-center text-slate-200 italic text-sm">
+                    <Clock className="w-8 h-8 mb-2 opacity-20" />
                     No recent activities
                   </div>
                 )}
@@ -639,7 +636,7 @@ export default function DashboardPage() {
             
             <button 
               onClick={() => window.location.href = '/booking'}
-              className="w-full mt-8 py-3 rounded-xl border border-white/5 text-white/40 text-sm font-bold hover:bg-white/5 hover:text-white transition-all hover:border-white/10"
+              className="w-full mt-8 py-3 rounded-xl border border-slate-100 text-slate-400 text-sm font-bold hover:bg-slate-50 hover:text-slate-900 transition-all"
             >
               View All History
             </button>
